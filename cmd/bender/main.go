@@ -1,13 +1,16 @@
 package main
 
-import "go.uber.org/fx"
+import (
+	"github.com/sackslab/bender/internal/logger"
+	"go.uber.org/fx"
+)
 
-// TODO: setup fx
-// TODO: setup logger
 // TODO: setup db conn
 // TODO: setup gin server
 func main() {
-	app := fx.New()
+	app := fx.New(
+		logger.RegistModule(),
+	)
 
 	app.Run()
 }
