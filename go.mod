@@ -3,6 +3,7 @@ module github.com/sackslab/bender
 go 1.17
 
 require (
+	github.com/Netflix/go-env v0.0.0-20210215222557-e437a7e7f9fb
 	go.uber.org/fx v1.16.0
 	go.uber.org/zap v1.20.0
 )
