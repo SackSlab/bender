@@ -4,13 +4,12 @@ import (
 	"fmt"
 
 	"github.com/sackslab/bender/cmd/bender/config"
+	"github.com/sackslab/bender/cmd/bender/srv"
 	"github.com/sackslab/bender/internal/fxgorm"
 	"github.com/sackslab/bender/internal/logger"
 	"go.uber.org/fx"
 )
 
-// TODO: setup env
-// TODO: setup gin server
 func main() {
 	app := fx.New(
 		logger.RegistModule(),
@@ -21,6 +20,7 @@ func main() {
 					c.DBHost, c.DBUser, c.DBPass, c.DBName)
 			},
 		),
+		srv.RegistModule(),
 	)
 
 	app.Run()
