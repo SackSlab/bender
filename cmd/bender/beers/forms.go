@@ -9,3 +9,13 @@ type CreateBeer struct {
 	Price    float64          `json:"Price" binding:"required,min=1"`
 	Currency validators.I4217 `json:"Currency" binding:"required"`
 }
+
+type BoxPriceQuery struct {
+	Quantity int64
+	Currency validators.I4217
+}
+
+type BoxPrice struct {
+	TotalAmount float64 `json:"TotalAmount"`
+	Currency    string  `json:"Currency"`
+}
