@@ -15,7 +15,7 @@ type service struct {
 }
 
 func NewService(db *gorm.DB, currLayerC *currencylayer.Client) *service {
-	svc := &service{db: db}
+	svc := &service{db: db, currLayerC: currLayerC}
 	db.AutoMigrate(&Beer{})
 	return svc
 }
@@ -61,14 +61,19 @@ func (svc *service) GetBoxPrice(ctx context.Context, pk int64, opts BoxPriceQuer
 		return nil, err
 	}
 
+	saleCurrency := opts.Currency.Name
+	if saleCurrency == "" {
+		saleCurrency = *beer.Currency
+	}
+
 	totalAmount := float64(opts.Quantity) * *beer.Price
-	if beer.Currency != &opts.Currency.Name {
+	if beer.Currency != &saleCurrency {
 		rates, err := svc.currLayerC.Latest()
 		if err != nil {
 			return nil, err
 		}
 
-		totalAmount, err = currencyrates.GetConversion(rates, totalAmount, *beer.Currency, opts.Currency.Name)
+		totalAmount, err = currencyrates.GetConversion(rates, totalAmount, *beer.Currency, saleCurrency)
 		if err != nil {
 			return nil, err
 		}
@@ -76,6 +81,6 @@ func (svc *service) GetBoxPrice(ctx context.Context, pk int64, opts BoxPriceQuer
 
 	return &BoxPrice{
 		TotalAmount: totalAmount,
-		Currency:    opts.Currency.Name,
+		Currency:    saleCurrency,
 	}, nil
 }
