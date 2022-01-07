@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 
+	"github.com/sackslab/bender/cmd/bender/beers"
 	"github.com/sackslab/bender/cmd/bender/config"
 	"github.com/sackslab/bender/cmd/bender/srv"
 	"github.com/sackslab/bender/internal/fxgorm"
@@ -21,6 +22,7 @@ func main() {
 			},
 		),
 		srv.RegistModule(),
+		beers.RegistModule(),
 	)
 
 	app.Run()
