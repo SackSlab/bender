@@ -2,10 +2,14 @@ package beers
 
 import (
 	"context"
+	"errors"
+	"fmt"
+	"net/http"
 
 	"github.com/jinzhu/copier"
 	"github.com/sackslab/bender/cmd/bender/currencyrates"
 	"github.com/sackslab/bender/internal/currencylayer"
+	"github.com/sackslab/bender/internal/middlewares/apperror"
 	"gorm.io/gorm"
 )
 
@@ -49,6 +53,13 @@ func (svc *service) ListBeers(ctx context.Context) ([]Beer, error) {
 func (svc *service) GetBeer(ctx context.Context, pk int64) (*Beer, error) {
 	var beer Beer
 	if result := svc.db.WithContext(ctx).First(&beer, pk); result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return nil, &apperror.AppError{
+				Code:    http.StatusNotFound,
+				Message: "resource of type 'beer' not found",
+			}
+		}
+
 		return nil, result.Error
 	}
 
@@ -70,12 +81,20 @@ func (svc *service) GetBoxPrice(ctx context.Context, pk int64, opts BoxPriceQuer
 	if beer.Currency != &saleCurrency {
 		rates, err := svc.currLayerC.Latest()
 		if err != nil {
-			return nil, err
+			return nil, &apperror.AppError{
+				Err:     err,
+				Code:    http.StatusServiceUnavailable,
+				Message: "service unavaible",
+			}
 		}
 
 		totalAmount, err = currencyrates.GetConversion(rates, totalAmount, *beer.Currency, saleCurrency)
 		if err != nil {
-			return nil, err
+			return nil, &apperror.AppError{
+				Err:     err,
+				Code:    http.StatusUnprocessableEntity,
+				Message: fmt.Sprintf("currency '%s', its not supported for conversion", saleCurrency),
+			}
 		}
 	}
 

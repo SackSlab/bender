@@ -30,7 +30,7 @@ func runServer(lc fx.Lifecycle, srv *gin.Engine, logger *zap.Logger, conf *confi
 			port := fmt.Sprintf(":%d", conf.AppPort)
 			logger.Info(fmt.Sprintf("[Starting] - serve at %s", port))
 
-			srv.Use(apperror.JSONAppErrorReporter())
+			srv.Use(apperror.JSONAppErrorReporter(logger))
 			go srv.Run(port)
 			return nil
 		},

@@ -8,29 +8,31 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"go.uber.org/zap"
 )
 
 type AppError struct {
-	err     error  `json:"-"`
+	Err     error  `json:"-"`
 	Code    int    `json:"code"`
 	Message string `json:"message"`
 }
 
 func (err *AppError) Error() string {
-	return fmt.Sprintf("AppError{msg:%s  code:%d  originalMsg: %s}", err.Message, err.Code, err.err.Error())
+	return fmt.Sprintf("AppError{msg:%s  code:%d  originalMsg: %s}", err.Message, err.Code, err.Err.Error())
 }
 
-func JSONAppErrorReporter() gin.HandlerFunc {
-	return jsonAppErrorReporterT(gin.ErrorTypeAny)
+func JSONAppErrorReporter(logger *zap.Logger) gin.HandlerFunc {
+	return jsonAppErrorReporterT(gin.ErrorTypeAny, logger)
 }
 
-func jsonAppErrorReporterT(errType gin.ErrorType) gin.HandlerFunc {
+func jsonAppErrorReporterT(errType gin.ErrorType, logger *zap.Logger) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Next()
 		detectedErrors := c.Errors.ByType(errType)
 
 		if len(detectedErrors) > 0 {
 			err := detectedErrors[0].Err
+			logger.Error(err.Error(), zap.Any("url", c.Request.URL), zap.Any("method", c.Request.Method))
 
 			if aerr, ok := err.(*AppError); ok {
 				c.AbortWithStatusJSON(aerr.Code, aerr)
@@ -47,7 +49,7 @@ func jsonAppErrorReporterT(errType gin.ErrorType) gin.HandlerFunc {
 
 			if ute, ok := err.(*json.UnmarshalTypeError); ok {
 				c.AbortWithStatusJSON(http.StatusBadRequest, &AppError{
-					err:     err,
+					Err:     err,
 					Code:    http.StatusBadRequest,
 					Message: fmt.Sprintf("Field: '%s' required type is '%s'", ute.Field, ute.Value),
 				})
@@ -59,7 +61,7 @@ func jsonAppErrorReporterT(errType gin.ErrorType) gin.HandlerFunc {
 				parsedErrs := make([]*AppError, 0)
 				for _, v := range validationErrors {
 					parsedErrs = append(parsedErrs, &AppError{
-						err:     v,
+						Err:     v,
 						Code:    http.StatusBadRequest,
 						Message: v.Error(),
 					})
@@ -70,7 +72,7 @@ func jsonAppErrorReporterT(errType gin.ErrorType) gin.HandlerFunc {
 			}
 
 			c.AbortWithStatusJSON(http.StatusInternalServerError, &AppError{
-				err:     err,
+				Err:     err,
 				Code:    http.StatusInternalServerError,
 				Message: "internal server error",
 			})
