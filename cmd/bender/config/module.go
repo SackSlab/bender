@@ -10,6 +10,8 @@ type Config struct {
 	DBPass string `env:"POSTGRES_PASSWORD,required=true"`
 	DBUser string `env:"POSTGRES_USER,required=true"`
 	DBHost string `env:"POSTGRES_HOST,required=true"`
+
+	AppPort int `env:"APP_PORT,required=true"`
 }
 
 func New() (*Config, error) {
