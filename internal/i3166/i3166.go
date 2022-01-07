@@ -269,8 +269,7 @@ type ISO3166 struct {
 	Code string
 }
 
-// ByCode resolves the given code to the 3 character string and the number of
-// minor unit digits to display for the given currency.
+// ByCode resolves the given code to the 3 character string
 func ByCode(c string) (ISO3166, bool) {
 	name, found := codes[c]
 	if !found {
@@ -280,8 +279,7 @@ func ByCode(c string) (ISO3166, bool) {
 	return ISO3166{Name: name, Code: c}, found
 }
 
-// ByName resolves the given name to the numeric code and the number of minor
-// unit digits to display for the given currency.
+// ByName resolves the given name to the numeric code
 func ByName(s string) (ISO3166, bool) {
 	code, found := names[s]
 	if !found {

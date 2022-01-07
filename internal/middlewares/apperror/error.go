@@ -46,7 +46,7 @@ func jsonAppErrorReporterT(errType gin.ErrorType) gin.HandlerFunc {
 			}
 
 			if ute, ok := err.(*json.UnmarshalTypeError); ok {
-				c.AbortWithStatusJSON(http.StatusUnsupportedMediaType, &AppError{
+				c.AbortWithStatusJSON(http.StatusBadRequest, &AppError{
 					err:     err,
 					Code:    http.StatusBadRequest,
 					Message: fmt.Sprintf("Field: '%s' required type is '%s'", ute.Field, ute.Value),
