@@ -18,12 +18,12 @@ type BaseDeleteAt struct {
 	DeletedAt gorm.DeletedAt `gorm:"index"`
 }
 
-type UUIDPk struct {
-	ID string `gorm:"primary_key;type:uuid;default:uuid_generate_v4()"`
+type Pk struct {
+	ID uint `gorm:"primarykey"`
 }
 
 type BaseModel struct {
-	UUIDPk
+	Pk
 	BaseCreatedAt
 	BaseUpdatedAt
 	BaseDeleteAt
