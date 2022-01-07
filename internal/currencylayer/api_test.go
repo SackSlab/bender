@@ -7,7 +7,7 @@ import (
 var opts = Options{
 	HostURL: "http://api.currencylayer.com",
 	// replace with your api key
-	ApiKey: "API_KEY",
+	ApiKey: "0417d6f26c8212b21109a33120b7a1e2",
 }
 
 func TestCall(t *testing.T) {
