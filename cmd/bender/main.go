@@ -6,6 +6,7 @@ import (
 	"github.com/sackslab/bender/cmd/bender/beers"
 	"github.com/sackslab/bender/cmd/bender/config"
 	"github.com/sackslab/bender/cmd/bender/srv"
+	"github.com/sackslab/bender/internal/currencylayer"
 	"github.com/sackslab/bender/internal/fxgorm"
 	"github.com/sackslab/bender/internal/logger"
 	"go.uber.org/fx"
@@ -22,6 +23,12 @@ func main() {
 			},
 		),
 		srv.RegistModule(),
+		currencylayer.RegistModule(func(c *config.Config) currencylayer.Options {
+			return currencylayer.Options{
+				HostURL: c.CurrencyLayerApiURL,
+				ApiKey:  c.CurrencyLayerAccessKey,
+			}
+		}),
 		beers.RegistModule(),
 	)
 

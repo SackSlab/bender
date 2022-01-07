@@ -12,6 +12,9 @@ type Config struct {
 	DBHost string `env:"POSTGRES_HOST,required=true"`
 
 	AppPort int `env:"APP_PORT,required=true"`
+
+	CurrencyLayerApiURL    string `env:"CL_API_URL,required=true"`
+	CurrencyLayerAccessKey string `env:"CL_ACCESS_KEY,required=true"`
 }
 
 func New() (*Config, error) {
