@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/sackslab/bender/cmd/bender/config"
+	"github.com/sackslab/bender/internal/middlewares/apperror"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 )
@@ -28,6 +29,8 @@ func runServer(lc fx.Lifecycle, srv *gin.Engine, logger *zap.Logger, conf *confi
 		OnStart: func(context.Context) error {
 			port := fmt.Sprintf(":%d", conf.AppPort)
 			logger.Info(fmt.Sprintf("[Starting] - serve at %s", port))
+
+			srv.Use(apperror.JSONAppErrorReporter())
 			go srv.Run(port)
 			return nil
 		},
